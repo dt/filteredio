@@ -1,0 +1,112 @@
+#include <dlfcn.h>
+#include <fcntl.h>
+#include <fts.h>
+#include <stdio.h>
+#include <sys/dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <unistd.h>
+
+FTS* my_fts_open(char * const *path_argv, int options, int (*compar)(const FTSENT **, const FTSENT **))
+{
+  FTS* r = fts_open(path_argv, options, compar);
+  DBG(cout << PURPLE << "fts_open: " << *path_argv << " ret " << r << RESET << "\n");
+  return r;
+}
+
+FTSENT * my_fts_read(FTS *ftsp)
+{
+  FTSENT* r = fts_read(ftsp);
+  if (r)
+    DBG(cout << PURPLE << "fts_read: " << ftsp << " ret " << r->fts_path << " / " << r->fts_name << " (" << r << ")\n" << RESET);
+  else
+    DBG(cout << PURPLE << "fts_read: " << ftsp << " ret NULL \n" << RESET);
+
+
+/*
+  FTSENT* cur = r;
+
+  DBG(while (cur) {
+    cout << PURPLE << "\tfts_read: " << cur << " item " << cur->fts_path << " / " << cur->fts_name << "\n" << RESET;
+    cur = cur->fts_link;
+  })*/
+
+  return r;
+}
+
+FTSENT * my_fts_children(FTS *ftsp, int options) {
+  DBG(cout << PURPLE << "fts_children staring...: " << ftsp << "\n" << RESET);
+  FTSENT* r = fts_children(ftsp, options);
+  FTSENT* cur = r;
+
+  if (r)
+    DBG(cout << PURPLE << "fts_children: " << ftsp << " ret " << r->fts_path << " / " << r->fts_name << " (" << r << ")\n" << RESET);
+  else
+    DBG(cout << PURPLE << "fts_children: " << ftsp << " ret NULL \n" << RESET);
+
+  while (cur) {
+    DBG(cout << PURPLE << "\t fts_children: " << cur << " item " << cur->fts_path << " / " << cur->fts_name << "\n" << RESET);
+    cur = cur->fts_link;
+  }
+  return r;
+}
+
+int my_fts_close(FTS *ftsp) {
+  int r = fts_close(ftsp);
+  DBG(cout << PURPLE << "fts_close: " << ftsp << " ret " << r << "\n" << RESET);
+  return r;
+}
+
+long my_telldir(DIR *dir)
+{
+  long r = telldir(dir);
+  DBG(cout << GREEN << "telldir: " << dir << " ret " << r << RESET << "\n");
+  return r;
+}
+
+void my_seekdir(DIR *dir, long offset)
+{
+  seekdir(dir, offset);
+  DBG(cout << GREEN << "seekdir: " << dir << RESET << "\n");
+}
+
+int my_fclose(FILE *stream)
+{
+  return fclose(stream);
+}
+
+size_t my_fread(void* ptr, size_t size, size_t n, FILE* stream)
+{
+  return fread(ptr, size, n, stream);
+}
+
+size_t my_fwrite(const void* ptr, size_t size, size_t n, FILE* stream)
+{
+  return fwrite(ptr, size, n, stream);
+}
+
+int my_fseek(FILE* stream, long int off, int whence)
+{
+  return fseek(stream, off, whence);
+}
+
+/*
+int fstat(int fildes, struct stat *buf);
+
+int fstat64(int fildes, struct stat64 *buf);
+
+int lstat(const char *restrict path, struct stat *restrict buf);
+
+int lstat64(const char *restrict path, struct stat64 *restrict buf);
+
+int stat(const char *restrict path, struct stat *restrict buf);
+
+int stat64(const char *restrict path, struct stat64 *restrict buf);
+*/
+
+//DYLD_INTERPOSE(my_fts_open, fts_open);
+//DYLD_INTERPOSE(my_fts_read, fts_read);
+//DYLD_INTERPOSE(my_fts_children, fts_children);
+//DYLD_INTERPOSE(my_fts_close, fts_close);
