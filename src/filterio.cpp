@@ -1,20 +1,8 @@
-
 #include <dirent.h>
-#include <dlfcn.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <fstream>
-#include <fts.h>
 #include <iostream>
-#include <libgen.h>
 #include <map>
-#include <stdio.h>
-#include <string>
-#include <sys/dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/utsname.h>
-#include <unistd.h>
 #include <unordered_set>
 
 #define DYLD_INTERPOSE(_replacment,_replacee) \
